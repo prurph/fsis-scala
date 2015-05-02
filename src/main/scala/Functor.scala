@@ -6,6 +6,22 @@ trait Functor[F[_]] {
 
   // Get F from Functor; A and B from type parameters to map
   def map[A, B](fa: F[A])(f: A => B): F[B]
+
+  /* Derived operations off of Functor */
+
+  // Lift the pure function A => B to a function executing with values wrapped
+  // in the functor's context.
+  def lift[A, B](f: A => B): F[A] => F[B] =
+    fa => map(fa)(f)
+
+  // Take the type constructor and map the constant function over fa. Ignores
+  // the input to map and just returns b.
+  // Functor[[List]].as(List(1,2), "foo") = List("foo", "foo")
+  def as[A, B](fa: F[A], b: => B): F[B] =
+    map(fa)(_ => b)
+
+  def void[A](fa: F[A]): F[Unit] =
+    as(fa, ())
 }
 
 // Laws that a Functor's #map must obey
@@ -38,4 +54,10 @@ object Functor {
     def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa.map(f)
   }
 
+  // This must be def because we require the type parameter A, and vals cannot
+  // have type parameters. X => ? is a type constructor that when you apply a
+  // proper type A, you get back a function X => A.
+  implicit def function1Functor[X]: Functor[X => ?] = new Functor[X => ?] {
+    def map[A, B](fa: X => A)(f: A => B): X => B = fa andThen f
+  }
 }
