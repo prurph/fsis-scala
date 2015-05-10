@@ -2,6 +2,7 @@ import simulacrum._
 
 // A functor is a type class that abstracts over type constructors (F[_]) that
 // can define a map function.
+// @typeclass from simulacrum gives ops, implicit summoning.
 @typeclass trait Functor[F[_]] { self =>
 
   // Get F from Functor; A and B from type parameters to map
