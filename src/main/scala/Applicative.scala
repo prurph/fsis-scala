@@ -1,6 +1,6 @@
 import simulacrum._
 
-@typeclass trait Applicative[F[_]] {
+@typeclass trait Applicative[F[_]] extends Functor[F] {
 
   // Example: take 1 and lift into List[Int](1)
   // Called pure because it takes a raw, "pure" value that exists outside of
@@ -18,8 +18,14 @@ import simulacrum._
   /* Derived methods */
 
   // Map is just apply but with function not wrapped in type constructor F.
-  def map[A, B](fa: F[A])(f: A => B): F[B] =
+  override def map[A, B](fa: F[A])(f: A => B): F[B] =
     apply(fa)(pure(f))
+
+  def map2[A, B, Z](fa: F[A], fb: F[B])(f: (A, B) => Z): F[Z] =
+    apply(fa)(map(fb)(b => f(_,b))) // or: apply(fb)(map(fa)(f.curried))
+
+  def map3[A, B, C, Z](fa: F[A], fb: F[B], fc: F[C])(f: (A, B, C) => Z): F[Z] =
+    apply(fa)(map2(fb, fc)((b, c) => f(_, b, c))) // or: apply(fa)(map2(fb, fc)(a => f(a, b, c)))
 }
 
 object Applicative {
