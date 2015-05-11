@@ -16,6 +16,10 @@ import simulacrum._
   def apply[A, B](fa: F[A])(ff: F[A => B]): F[B]
 
   /* Derived methods */
+
+  // Map is just apply but with function not wrapped in type constructor F.
+  def map[A, B](fa: F[A])(f: A => B): F[B] =
+    apply(fa)(pure(f))
 }
 
 object Applicative {
@@ -32,7 +36,9 @@ object Applicative {
 
   implicit val listApplicative: Applicative[List] = new Applicative[List] {
     def pure[A](a: A): List[A] = List(a)
-    def apply[A, B](fa: List[A])(ff: List[A => B]): List[B] =
-      (fa zip ff).map { case (a, f) => f(a) }
+    def apply[A, B](fa: List[A])(ff: List[A => B]): List[B] = for {
+      a <- fa
+      f <- ff
+    } yield f(a)
   }
 }
