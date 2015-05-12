@@ -48,7 +48,7 @@ trait FunctorLaws {
     F.map(fa)(a => a) == fa
 
   // Can either map piecewise (map f over fa to give F[B] then map g over that
-  // to give F[C]) or hook f and up together to yield new function A => C and
+  // to give F[C]) or hook f and g together to yield new function A => C and
   // then map that directly over fa to give F[C].
   def composition[F[_], A, B, C](fa: F[A], f: A => B, g: B => C)(implicit F: Functor[F]) =
     F.map(F.map(fa)(f))(g) == F.map(fa)(f andThen g)
