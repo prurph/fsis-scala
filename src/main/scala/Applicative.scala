@@ -77,3 +77,19 @@ object Applicative {
     } yield f(a)
   }
 }
+
+trait ApplicativeLaws[F[_]] {
+
+  import Applicative.ops._
+
+  implicit def F: Applicative[F]
+
+  def applicativeIdentity[A](fa: F[A]) =
+    fa.apply(F.pure((a: A) => a)) == fa
+
+  // Result of lifting A and applying lifted A => B must match the result of
+  // directly applying the A => B to A and _then_ lifting it into context.
+  // Function application "distributes over" apply and pure.
+  def applicativeHomomorphism[A, B](a: A, f: A => B) =
+    F.pure(a).apply(F.pure(f)) == F.pure(f(a))
+}
