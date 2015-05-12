@@ -9,3 +9,4 @@ addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion
 addCompilerPlugin("org.spire-math" % "kind-projector" % "0.5.2" cross CrossVersion.binary)
 
 libraryDependencies += "com.github.mpilquist" %% "simulacrum" % "0.3.0"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"

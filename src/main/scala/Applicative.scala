@@ -80,16 +80,35 @@ object Applicative {
 
 trait ApplicativeLaws[F[_]] {
 
+  import IsEq._
   import Applicative.ops._
 
   implicit def F: Applicative[F]
 
   def applicativeIdentity[A](fa: F[A]) =
-    fa.apply(F.pure((a: A) => a)) == fa
+    fa.apply(F.pure((a: A) => a)) =?= fa
 
   // Result of lifting A and applying lifted A => B must match the result of
   // directly applying the A => B to A and _then_ lifting it into context.
   // Function application "distributes over" apply and pure.
   def applicativeHomomorphism[A, B](a: A, f: A => B) =
-    F.pure(a).apply(F.pure(f)) == F.pure(f(a))
+    F.pure(a).apply(F.pure(f)) =?= F.pure(f(a))
+
+  // Lifting A and applying ff to it gives the same F[B] as lifting a function
+  // A => B that returns f(a) and applying it to ff. In the second case we
+  // lift an (A => B) => B, then apply it to F[A => B] to give F[B].
+  def applicativeInterchage[A, B](a: A, ff: F[A => B]) =
+    F.pure(a).apply(ff) =?= ff.apply(F.pure((f: A => B) => f(a)))
+
+  // Map operation must be consistent with apply and pure.
+  // Mapping over fa with pure function f must be equal to applying the a lifted
+  // f.
+  def applicativeMap[A, B](fa: F[A], f: A => B) =
+    fa.map(f) =?= fa.apply(F.pure(f))
+}
+
+object ApplicativeLaws {
+  def apply[F[_]](implicit F0: Applicative[F]): ApplicativeLaws[F] = new ApplicativeLaws[F] {
+    def F = F0
+  }
 }
