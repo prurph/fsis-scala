@@ -76,6 +76,20 @@ object Applicative {
       f <- ff
     } yield f(a)
   }
+
+  implicit val streamApplicative: Applicative[Stream] = new Applicative[Stream] {
+    def pure[A](a: A) = Stream.continually(a)
+    // If pure returned a singleton stream, Stream(a), this apply would not be
+    // lawful, because applying, for example, Stream(identity) to Stream(1,2,3)
+    // would return Stream(1), not the original stream. By making pure an
+    // infinite stream, this implementation becomes lawful.
+
+    // This only works for Stream in scala, because it can be infinite. In
+    // Haskell, a list is lazily evaluated, so Haskell has list applicatives for
+    // both the cross-product (above) and this zip apply.
+    def apply[A, B](fa: Stream[A])(ff: Stream[A => B]): Stream[B] =
+      (fa zip ff) map { case (a, f) => f(a) }
+  }
 }
 
 trait ApplicativeLaws[F[_]] {

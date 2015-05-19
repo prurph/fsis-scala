@@ -17,6 +17,11 @@ object Equal {
       x.zip(y).forall { case (xx, yy) => EA.isEqual(xx, yy) }
     }
   )
+  implicit def eqStream[A](implicit EA: Equal[A]): Equal[Stream[A]] = instance((x, y) =>
+    x.size == y.size && {
+      x.zip(y).forall { case (xx, yy) => EA.isEqual(xx, yy) }
+    }
+  )
   implicit def optionEqual[A](implicit EA: Equal[A]): Equal[Option[A]] = Equal.instance((x, y) => (x, y) match {
     case (Some(x), Some(y)) => EA.isEqual(x, y)
     case (None, None) => true

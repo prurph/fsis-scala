@@ -23,3 +23,7 @@ abstract class ApplicativeInstanceTest[F[_]](name: String)(implicit
 
 object ListApplicativeTest extends ApplicativeInstanceTest[List]("List")
 object OptionApplicativeTest extends ApplicativeInstanceTest[Option]("Option")
+
+// This is lawful, but the implementation results in endless testing as we try
+// to zip an infinite stream.
+// object StreamApplicativeTest extends ApplicativeInstanceTest[Stream]("Stream")
