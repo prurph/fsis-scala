@@ -14,4 +14,13 @@ import simulacrum._
   // flatMap ff as first argument, must now supply an [A => B] => F[B]
   override def apply[A, B](fa: F[A])(ff: F[A => B]): F[B] =
     flatMap(ff)((f: A => B) => map(fa)(f))
+
+  // Don't have to implement map specifically (inherits from Applicative; defined
+  // in terms of pure and apply), but often see performance increase by implementing
+  // in terms of flatMap and pure.
+  override def map[A, B](fa: F[A])(f: A => B): F[B] =
+    flatMap(fa)(a => pure(f(a)))
+
+  def flatten[A](ffa: F[F[A]]): F[A] =
+    flatMap(ffa)(identity)
 }
