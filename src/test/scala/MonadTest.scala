@@ -30,3 +30,10 @@ abstract class MonadInstanceTest[F[_]](name: String)(implicit
 
 object ListMonadTest extends MonadInstanceTest[List]("List")
 object OptionMonadTest extends MonadInstanceTest[Option]("Option")
+// Monad[List[Option]] not available implicitly, so pass explicitly. This fails
+// because we can't compose two arbitrary monads and we haven't done anything
+// specific for the starting Option monad.
+// object ListOptionMonadTest extends MonadInstanceTest[Lambda[X => List[Option[X]]]]("List[Option]")(
+//   Monad[List] compose Monad[Option],
+//   implicitly, implicitly, implicitly, implicitly, implicitly, implicitly
+// )
